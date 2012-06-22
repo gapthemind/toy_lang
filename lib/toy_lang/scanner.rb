@@ -21,9 +21,25 @@ module ToyLang
 
     def set_program(program)
       @program = program
+      @token_list =[] # used to keep tokens for look_ahead
+    end
+
+    def look_ahead(number_of_tokens = 1)
+      while @token_list.size < number_of_tokens
+        @token_list << consume_token
+      end
+      @token_list[number_of_tokens - 1]
     end
 
     def get_next_token
+      if @token_list.empty?
+        consume_token
+      else
+        @token_list.shift
+      end
+    end
+
+    def consume_token
       clear_whitespace
       if @program.size == 0
         return Token.new(:eof)

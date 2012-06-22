@@ -71,6 +71,18 @@ describe ToyLang::Scanner do
     assert_token_is :eof
   end
 
+  describe "look_ahead" do
+    it "without parameters look one ahead" do
+      @scanner.set_program("token")
+      @scanner.look_ahead.content.should == "token"
+    end
+
+    it "with parameter looks ahead 'n' tokens" do
+      @scanner.set_program("def method")
+      @scanner.look_ahead(2).content.should == "method"
+    end
+  end
+
   def assert_token_content_is(content)
     @scanner.get_next_token.content.should == content
   end
