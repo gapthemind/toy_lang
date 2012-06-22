@@ -14,4 +14,7 @@ Gem::Specification.new do |gem|
   gem.name          = "toy_lang"
   gem.require_paths = ["lib"]
   gem.version       = ToyLang::VERSION
+
+  gem.add_development_dependency "rspec"
+  gem.add_development_dependency "rake"
 end
