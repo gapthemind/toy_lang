@@ -11,6 +11,7 @@ module ToyLang
   #     statement*
   #   statement =>
   #     function_definition |
+  #     conditional_expression |
   #     expression
   #   function_definition =>
   #     function_header OPEN_BLOCK expression* CLOSE_BLOCK
@@ -18,9 +19,12 @@ module ToyLang
   #     DEF IDENTIFIER OPEN_PARENTHESES argument_list CLOSE_PARENTHESES
   #   argument_list =>
   #     (IDENTIFIER ( COMMA IDENTIFIER)*)
+  #   conditional_expression =>
+  #     IF condition OPEN_BLOCK expression* CLOSE_BLOCK
   #   expression =>
   #     function_call |
   #     additive_expression |
+  #     return_expression |
   #     NUMBER
   #   additive_expression =>
   #     substraction_expression PLUS substraction_expression
@@ -30,11 +34,13 @@ module ToyLang
   #     IDENTIFIER OPEN_PARENTHESES parameter_list CLOSE_PARENTHESES
   #   parameter_list =>
   #     (expression ( COMMA expression)*)
+  #   return_expression =>
+  #     RETURN expression
   #
   # An example program would be
   # def fibbo(number) {
-  #   if number == 0 return 0
-  #   if number == 1 return 1
+  #   if number == 0 { return 0 }
+  #   if number == 1 { return 1 }
   #   return fibbo(number-1) + fibbo(number-2)
   # }
   # fibbo(5)
