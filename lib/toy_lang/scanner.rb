@@ -2,7 +2,7 @@ module ToyLang
   class Scanner
 
     # Tokens the scanner generates
-    # :class => for 'class' tokens
+    # :return => for 'return' tokens
     # :def => for 'def' tokens
     # :number => for regexp '\d+'
     # :id => for '[a-z]+'
@@ -40,7 +40,7 @@ module ToyLang
 
     def identifier
       program = consume(IDENTIFIER)
-      return Token.new(:class) if program == "class"
+      return Token.new(:return) if program == "return"
       return Token.new(:def) if program == "def"
       return Token.new(:id,program)
     end

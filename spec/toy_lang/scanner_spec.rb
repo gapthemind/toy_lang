@@ -16,14 +16,14 @@ describe ToyLang::Scanner do
     assert_token_is :eof
   end
 
-  it "returns :class when token is 'class'" do
-    @scanner.set_program("class")
-    assert_token_is :class
+  it "returns :return when token is 'return'" do
+    @scanner.set_program("return")
+    assert_token_is :return
   end
 
   it "returns :def when token is 'def'" do
-    @scanner.set_program("class")
-    assert_token_is :class
+    @scanner.set_program("def")
+    assert_token_is :def
   end
 
   it "returns :id when token is not a reserved word" do
@@ -58,20 +58,15 @@ describe ToyLang::Scanner do
 
   it "scans small program" do
     @scanner.set_program """
-      class test {
-        def method {
-          9
-        }
+      def method {
+        return 9
       }
       """
-    assert_token_is :class
-    assert_token_and_content_is :id, "test"
-    assert_token_is :open_block
     assert_token_is :def
     assert_token_and_content_is :id, "method"
     assert_token_is :open_block
+    assert_token_is :return
     assert_token_and_content_is :number, "9"
-    assert_token_is :close_block
     assert_token_is :close_block
     assert_token_is :eof
   end

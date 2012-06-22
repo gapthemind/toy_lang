@@ -56,7 +56,7 @@ module ToyLang
     # return_expression =>
     #   RETURN expression
     def return_expression
-      if @scanner.consume.symbol == :return
+      if @scanner.get_next_token.symbol == :return
         return {return: expression()}
       end
       throw Exception.new("Expected return expression")
