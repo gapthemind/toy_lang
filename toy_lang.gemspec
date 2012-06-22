@@ -3,9 +3,9 @@ require File.expand_path('../lib/toy_lang/version', __FILE__)
 
 Gem::Specification.new do |gem|
   gem.authors       = ["Diego Alonso"]
-  gem.email         = ["diego@intersect.org.au"]
-  gem.description   = %q{TODO: Write a gem description}
-  gem.summary       = %q{TODO: Write a gem summary}
+  gem.email         = ["diego@gapthemind.net"]
+  gem.description   = %q{tay language parser}
+  gem.summary       = %q{Toy Language parser and scanner to play with language compilation}
   gem.homepage      = ""
 
   gem.files         = `git ls-files`.split($\)
