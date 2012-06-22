@@ -48,5 +48,30 @@ module ToyLang
   # This program should output 8
   class Parser
 
+    def program=(program)
+      @scanner = Scanner.new
+      @scanner.set_program(program)
+    end
+
+    # return_expression =>
+    #   RETURN expression
+    def return_expression
+      if @scanner.consume.symbol == :return
+        return {return: expression()}
+      end
+      throw Exception.new("Expected return expression")
+    end
+
+    # expression =>
+    #   NUMBER
+    # !!! INCOMPLETE IMPLEMENTATION !!!
+    def expression
+      token = @scanner.get_next_token
+      if token.symbol == :number
+        return { number: token.content }
+      end
+      throw Exception.new("Could not evaluate expression")
+    end
+
   end
 end
