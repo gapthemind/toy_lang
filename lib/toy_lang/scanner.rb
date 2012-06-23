@@ -16,6 +16,8 @@ module ToyLang
     OPEN_BLOCK = /\A\{/
     CLOSE_BLOCK = /\A\}/
 
+    RESERVED_WORDS = %w[return def]
+
     def initialize
     end
 
@@ -57,10 +59,10 @@ module ToyLang
     end
 
     def identifier
-      program = consume(IDENTIFIER)
-      return Token.new(:return) if program == "return"
-      return Token.new(:def) if program == "def"
-      return Token.new(:id,program)
+      ident = consume(IDENTIFIER)
+      # Check if the token is part of the reserved words
+      return Token.new(ident.to_sym, ident) if RESERVED_WORDS.include? ident
+      return Token.new(:id,ident)
     end
 
     def digit
