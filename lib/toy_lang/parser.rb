@@ -137,6 +137,8 @@ module ToyLang
       return { number: token.content }
     end
 
+    private
+
     def token_is?(token)
       tokens_are?(token)
     end
