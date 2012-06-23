@@ -18,21 +18,9 @@ module ToyLang
 
     RESERVED_WORDS = %w[return def]
 
-    def initialize
-    end
-
     def set_program(program)
       @program = program
       @token_list =[] # used to keep tokens in look_aheads
-    end
-
-    def look_ahead(number_of_tokens = 1)
-      while @token_list.size < number_of_tokens
-        token = consume_token
-        @token_list << token
-        throw :scanner_exception if token.symbol == :eof && @token_list.size < number_of_tokens
-      end
-      @token_list[number_of_tokens - 1]
     end
 
     def get_next_token
@@ -41,6 +29,17 @@ module ToyLang
       else
         @token_list.shift
       end
+    end
+
+    def look_ahead(number_of_tokens = 1)
+      end_of_file_met = false
+      while @token_list.size < number_of_tokens
+        throw :scanner_exception if end_of_file_met
+        token = consume_token
+        @token_list << token
+        end_of_file_met = token.symbol == :eof
+      end
+      @token_list[number_of_tokens - 1]
     end
 
     def consume_token
