@@ -12,7 +12,8 @@ module ToyLang
   #   statement =>
   #     function_definition |
   #     conditional_expression |
-  #     expression
+  #     function_call |
+  #     return_statement
   #   function_definition =>
   #     function_header OPEN_BLOCK expression* CLOSE_BLOCK
   #   function_header =>
@@ -22,19 +23,18 @@ module ToyLang
   #   conditional_expression =>
   #     IF condition OPEN_BLOCK expression* CLOSE_BLOCK
   #   expression =>
-  #     function_call |
-  #     additive_expression |
-  #     return_expression |
-  #     NUMBER
+  #     additive_expression
   #   additive_expression =>
   #     substraction_expression PLUS substraction_expression
   #   substraction_expression =>
-  #     expression MINUS expression
+  #     primary_expresion MINUS primary_expresion
+  #   primary_expresion =>
+  #     NUMBER
   #   function_call =>
   #     IDENTIFIER OPEN_PARENTHESES parameter_list CLOSE_PARENTHESES
   #   parameter_list =>
   #     (expression ( COMMA expression)*)
-  #   return_expression =>
+  #   return_statement =>
   #     RETURN expression
   #
   # An example program would be
@@ -53,18 +53,79 @@ module ToyLang
       @scanner.set_program(program)
     end
 
-    # return_expression =>
-    #   RETURN expression
-    def return_expression
-      if @scanner.get_next_token.symbol == :return
-        return {return: expression()}
+    # statement =>
+    #   function_definition |
+    #   conditional_expression |
+    #   function_call |
+    #   return_statement
+    def statement
+      # ast => Abstract Syntax Tree
+      if ((ast = function_definition) != nil)
+        return ast
+      elsif ((ast = conditional_expression) != nil)
+        return ast
+      elsif ((ast = function_call) != nil)
+        return ast
+      elsif ((ast = return_statement) != nil)
+        return ast
       end
-      throw Exception.new("Expected return expression")
+      throw :parser_exception
+    end
+
+    # function_definition =>
+    #   function_header OPEN_BLOCK expression* CLOSE_BLOCK
+    def function_definition
+      return nil
+    end
+
+    # conditional_expression =>
+    #   IF condition OPEN_BLOCK expression* CLOSE_BLOCK
+    def conditional_expression
+      return nil
+    end
+
+    # function_call =>
+    #   IDENTIFIER OPEN_PARENTHESES parameter_list CLOSE_PARENTHESES
+    def function_call
+      unless @scanner.look_ahead.symbol == :id &&
+             @scanner.look_ahead(2).symbol == :open_parentheses
+        return nil
+      end
+
+      method_name = @scanner.get_next_token.content
+      @scanner.get_next_token # open parentheses
+      params = parameter_list()
+
+      # Verify close parentheses
+      if @scanner.get_next_token.symbol != :close_parentheses
+        throw :parser_exception
+      end
+
+      return { function_call: method_name, params: params }
+    end
+
+    # parameter_list =>
+    #   (expression ( COMMA expression)*)
+    def parameter_list
+      # TODO: create proper implementation
+      [ { number: "1" } ]
+    end
+
+    # return_statement =>
+    #   RETURN expression
+    def return_statement
+      unless @scanner.look_ahead.symbol == :return
+        return nil
+      end
+
+      @scanner.get_next_token
+      return {return: expression()}
     end
 
     # expression =>
-    #   NUMBER
+    #   ....
     # !!! INCOMPLETE IMPLEMENTATION !!!
+    # To get going, expression can only be a number
     def expression
       token = @scanner.get_next_token
       if token.symbol == :number

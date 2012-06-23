@@ -6,17 +6,18 @@ describe ToyLang::Parser do
     @parser = ToyLang::Parser.new
   end
 
-  describe "expression" do
-    it "parses numbers" do
-      @parser.program = "2"
-      @parser.expression.should == { number: "2" }
+  describe "return statement" do
+    it "parses" do
+      @parser.program = "return 2"
+      @parser.statement.should == {return: { number: "2" }}
     end
   end
 
-  describe "return expression" do
-    it "parses" do
-      @parser.program = "return 2"
-      @parser.return_expression.should == {return: { number: "2" }}
+  describe "function call" do
+    it "parses function" do
+      #TODO: expand when parameter_list gets implemented
+      @parser.program = "methodname()"
+      @parser.statement.should == { function_call: 'methodname', :params => [ {number: "1"}]}
     end
   end
 end

@@ -56,6 +56,16 @@ describe ToyLang::Scanner do
     assert_token_is :close_block
   end
 
+  it "returns :open_parentheses when token is '('" do
+    @scanner.set_program("(")
+    assert_token_is :open_parentheses
+  end
+
+  it "returns :close_parentheses when token is ')'" do
+    @scanner.set_program(")")
+    assert_token_is :close_parentheses
+  end
+
   it "scans small program" do
     @scanner.set_program """
       def method {

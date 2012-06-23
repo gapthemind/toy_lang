@@ -15,6 +15,8 @@ module ToyLang
     DIGITS = /\A\d+/
     OPEN_BLOCK = /\A\{/
     CLOSE_BLOCK = /\A\}/
+    OPEN_PARENTHESES = /\A\(/
+    CLOSE_PARENTHESES = /\A\)/
 
     RESERVED_WORDS = %w[return def]
 
@@ -63,10 +65,21 @@ module ToyLang
       Token.new(:close_block)
     end
 
+     def open_parentheses
+      consume(OPEN_PARENTHESES)
+      Token.new(:open_parentheses)
+    end
+
+    def close_parentheses
+      consume(CLOSE_PARENTHESES)
+      Token.new(:close_parentheses)
+    end
+
     private
 
     def consume_token
       clear_whitespace
+      # TODO: Refactor elsifs to use a regexp table
       if @program.size == 0
         return Token.new(:eof)
       elsif @program =~ IDENTIFIER
@@ -77,6 +90,10 @@ module ToyLang
         return open_block
       elsif @program =~ CLOSE_BLOCK
         return close_block
+      elsif @program =~ OPEN_PARENTHESES
+        return open_parentheses
+      elsif @program =~ CLOSE_PARENTHESES
+        return close_parentheses
       end
     end
 
