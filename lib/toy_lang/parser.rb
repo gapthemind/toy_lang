@@ -87,8 +87,7 @@ module ToyLang
     # function_call =>
     #   IDENTIFIER OPEN_PARENTHESES parameter_list CLOSE_PARENTHESES
     def function_call
-      unless @scanner.look_ahead.is?(:id) &&
-             @scanner.look_ahead(2).is?(:open_parentheses)
+      unless tokens_are?(:id, :open_parentheses)
         return nil
       end
 
@@ -97,9 +96,11 @@ module ToyLang
       params = parameter_list()
 
       # Verify close parentheses
-      if @scanner.get_next_token.is_not? :close_parentheses
+      if token_is_not? :close_parentheses
         throw :parser_exception
       end
+
+      @scanner.get_next_token # close parentheses
 
       return { function_call: method_name, params: params }
     end
@@ -114,7 +115,7 @@ module ToyLang
     # return_statement =>
     #   RETURN expression
     def return_statement
-      unless @scanner.look_ahead.is? :return
+      unless token_is? :return
         return nil
       end
 
@@ -126,12 +127,31 @@ module ToyLang
     #   ....
     # !!! INCOMPLETE IMPLEMENTATION !!!
     # To get going, expression can only be a number
+    # TODO: Do it for real
     def expression
-      token = @scanner.get_next_token
-      if token.is? :number
-        return { number: token.content }
+      if token_is_not? :number
+        nil
       end
-      throw Exception.new("Could not evaluate expression")
+
+      token = @scanner.get_next_token
+      return { number: token.content }
+    end
+
+    def token_is?(token)
+      tokens_are?(token)
+    end
+
+    def token_is_not?(token)
+      not token_is? token
+    end
+
+    def tokens_are?(*tokens)
+      look_ahead_index = 1
+      tokens.each do |token|
+        return false if @scanner.look_ahead(look_ahead_index).is_not? token
+        look_ahead_index += 1
+      end
+      return true
     end
 
   end
