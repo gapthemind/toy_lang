@@ -80,9 +80,12 @@ module ToyLang
     def consume_token
       clear_whitespace
       # TODO: Refactor elsifs to use a regexp table
+      # I am not convinced the code will be prettier
       if @program.size == 0
         return Token.new(:eof)
-      elsif @program =~ IDENTIFIER
+      end
+
+      if @program =~ IDENTIFIER
         return identifier
       elsif @program =~ DIGITS
         return digit
