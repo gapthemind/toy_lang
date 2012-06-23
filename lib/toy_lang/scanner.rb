@@ -42,21 +42,6 @@ module ToyLang
       @token_list[number_of_tokens - 1]
     end
 
-    def consume_token
-      clear_whitespace
-      if @program.size == 0
-        return Token.new(:eof)
-      elsif @program =~ IDENTIFIER
-        return identifier
-      elsif @program =~ DIGITS
-        return digit
-      elsif @program =~ OPEN_BLOCK
-        return open_block
-      elsif @program =~ CLOSE_BLOCK
-        return close_block
-      end
-    end
-
     def identifier
       ident = consume(IDENTIFIER)
       # Check if the token is part of the reserved words
@@ -76,6 +61,23 @@ module ToyLang
     def close_block
       consume(CLOSE_BLOCK)
       Token.new(:close_block)
+    end
+
+    private
+
+    def consume_token
+      clear_whitespace
+      if @program.size == 0
+        return Token.new(:eof)
+      elsif @program =~ IDENTIFIER
+        return identifier
+      elsif @program =~ DIGITS
+        return digit
+      elsif @program =~ OPEN_BLOCK
+        return open_block
+      elsif @program =~ CLOSE_BLOCK
+        return close_block
+      end
     end
 
     def clear_whitespace
