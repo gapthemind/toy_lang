@@ -21,12 +21,14 @@ module ToyLang
 
     def set_program(program)
       @program = program
-      @token_list =[] # used to keep tokens for look_ahead
+      @token_list =[] # used to keep tokens in look_aheads
     end
 
     def look_ahead(number_of_tokens = 1)
       while @token_list.size < number_of_tokens
-        @token_list << consume_token
+        token = consume_token
+        @token_list << token
+        throw :scanner_exception if token.symbol == :eof && @token_list.size < number_of_tokens
       end
       @token_list[number_of_tokens - 1]
     end
