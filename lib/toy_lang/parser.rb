@@ -87,8 +87,8 @@ module ToyLang
     # function_call =>
     #   IDENTIFIER OPEN_PARENTHESES parameter_list CLOSE_PARENTHESES
     def function_call
-      unless @scanner.look_ahead.symbol == :id &&
-             @scanner.look_ahead(2).symbol == :open_parentheses
+      unless @scanner.look_ahead.is?(:id) &&
+             @scanner.look_ahead(2).is?(:open_parentheses)
         return nil
       end
 
@@ -97,7 +97,7 @@ module ToyLang
       params = parameter_list()
 
       # Verify close parentheses
-      if @scanner.get_next_token.symbol != :close_parentheses
+      if @scanner.get_next_token.is_not? :close_parentheses
         throw :parser_exception
       end
 
@@ -114,7 +114,7 @@ module ToyLang
     # return_statement =>
     #   RETURN expression
     def return_statement
-      unless @scanner.look_ahead.symbol == :return
+      unless @scanner.look_ahead.is? :return
         return nil
       end
 
@@ -128,7 +128,7 @@ module ToyLang
     # To get going, expression can only be a number
     def expression
       token = @scanner.get_next_token
-      if token.symbol == :number
+      if token.is? :number
         return { number: token.content }
       end
       throw Exception.new("Could not evaluate expression")

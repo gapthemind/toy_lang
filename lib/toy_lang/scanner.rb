@@ -39,7 +39,7 @@ module ToyLang
         throw :scanner_exception if end_of_file_met
         token = consume_token
         @token_list << token
-        end_of_file_met = token.symbol == :eof
+        end_of_file_met = token.is? :eof
       end
       @token_list[number_of_tokens - 1]
     end
