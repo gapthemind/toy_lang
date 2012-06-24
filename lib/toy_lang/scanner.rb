@@ -12,9 +12,9 @@ module ToyLang
 
     IDENTIFIER = /\A[a-z]+/
     WHITESPACE = /\A\s+/
-    DIGITS = /\A\d+/
 
-    LANGUAGE_SYMBOLS = {
+    LANGUAGE_TOKENS = {
+      number: /\A\d+/,
       open_block: /\A\{/,
       close_block: /\A\}/,
       open_parentheses: /\A\(/,
@@ -55,10 +55,6 @@ module ToyLang
       return Token.new(:id,ident)
     end
 
-    def digit
-      Token.new(:number, consume(DIGITS))
-    end
-
     private
 
     def consume_token
@@ -67,15 +63,12 @@ module ToyLang
         return Token.new(:eof)
       elsif @program =~ IDENTIFIER
         return identifier
-      elsif @program =~ DIGITS
-        return digit
       end
 
       # Check for language symbols
-      LANGUAGE_SYMBOLS.each do |symbol, reg_exp|
+      LANGUAGE_TOKENS.each do |symbol, reg_exp|
         if @program =~ reg_exp
-          consume(reg_exp)
-          return Token.new(symbol)
+          return Token.new(symbol, consume(reg_exp))
         end
       end
 
