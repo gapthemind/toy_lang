@@ -13,11 +13,14 @@ module ToyLang
     IDENTIFIER = /\A[a-z]+/
     WHITESPACE = /\A\s+/
     DIGITS = /\A\d+/
-    OPEN_BLOCK = /\A\{/
-    CLOSE_BLOCK = /\A\}/
-    OPEN_PARENTHESES = /\A\(/
-    CLOSE_PARENTHESES = /\A\)/
-    COMMA = /\A,/
+
+    LANGUAGE_SYMBOLS = {
+      open_block: /\A\{/,
+      close_block: /\A\}/,
+      open_parentheses: /\A\(/,
+      close_parentheses: /\A\)/,
+      comma: /\A,/
+    }
 
     RESERVED_WORDS = %w[return def]
 
@@ -56,56 +59,27 @@ module ToyLang
       Token.new(:number, consume(DIGITS))
     end
 
-    def open_block
-      consume(OPEN_BLOCK)
-      Token.new(:open_block)
-    end
-
-    def close_block
-      consume(CLOSE_BLOCK)
-      Token.new(:close_block)
-    end
-
-     def open_parentheses
-      consume(OPEN_PARENTHESES)
-      Token.new(:open_parentheses)
-    end
-
-    def close_parentheses
-      consume(CLOSE_PARENTHESES)
-      Token.new(:close_parentheses)
-    end
-
-    def comma
-      consume(COMMA)
-      Token.new(:comma)
-    end
-
     private
 
     def consume_token
       clear_whitespace
-      # TODO: Refactor elsifs to use a regexp table
-      # I am not convinced the code will be prettier
       if @program.size == 0
         return Token.new(:eof)
-      end
-
-      if @program =~ IDENTIFIER
+      elsif @program =~ IDENTIFIER
         return identifier
       elsif @program =~ DIGITS
         return digit
-      elsif @program =~ OPEN_BLOCK
-        return open_block
-      elsif @program =~ CLOSE_BLOCK
-        return close_block
-      elsif @program =~ OPEN_PARENTHESES
-        return open_parentheses
-      elsif @program =~ CLOSE_PARENTHESES
-        return close_parentheses
-      elsif @program =~ COMMA
-        return comma
       end
+
+      # Check for language symbols
+      LANGUAGE_SYMBOLS.each do |symbol, reg_exp|
+        if @program =~ reg_exp
+          consume(reg_exp)
+          return Token.new(symbol)
+        end
+      end
+
+      throw :scanner_exception # Unrecognized token
     end
 
     def clear_whitespace
