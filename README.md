@@ -33,7 +33,9 @@ Or install it yourself as:
     # Set the program
     @parser.program = "methodname(1,3)"
     # Generate the AST
-    puts @parser.program
+    # puts @parser.program
+    # For the time being, only statement is implemented
+    puts @parser.statement
 
 TODO: Find better names to avoid collision between 'program =' and
 program
