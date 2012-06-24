@@ -110,7 +110,9 @@ module ToyLang
     def parameter_list
       expression_list = []
       expr = expression()
-      expression_list << expr if expr != nil
+      return [] if expr == nil
+
+      expression_list << expr
 
       while (token_is? :comma)
         @scanner.get_next_token # the comma

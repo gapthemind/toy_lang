@@ -15,10 +15,29 @@ describe ToyLang::Parser do
 
   describe "function call" do
     it "parses function" do
-      #TODO: expand when parameter_list gets implemented
       @parser.program = "methodname(1,3)"
       @parser.statement.should == { function_call: 'methodname',
                                     params: [ {number: "1"}, {number: "3"} ]}
+    end
+
+    it "throws parser_exception when no closing parentheses" do
+      @parser.program = "methodname(1,3"
+      expect { @parser.statement }.to throw_symbol :parser_exception
+    end
+
+    it "throws parser_exception when no further expression after comma" do
+      @parser.program = "methodname(1,"
+      expect { @parser.statement }.to throw_symbol :parser_exception
+    end
+
+    it "throws parser_exception when first expression empty" do
+      @parser.program = "methodname(,3)"
+      expect { @parser.statement }.to throw_symbol :parser_exception
+    end
+
+    it "throws parser_exception when middle expression empty" do
+      @parser.program = "methodname(1,,3)"
+      expect { @parser.statement }.to throw_symbol :parser_exception
     end
   end
 end
