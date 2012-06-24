@@ -17,6 +17,7 @@ module ToyLang
     CLOSE_BLOCK = /\A\}/
     OPEN_PARENTHESES = /\A\(/
     CLOSE_PARENTHESES = /\A\)/
+    COMMA = /\A,/
 
     RESERVED_WORDS = %w[return def]
 
@@ -75,6 +76,11 @@ module ToyLang
       Token.new(:close_parentheses)
     end
 
+    def comma
+      consume(COMMA)
+      Token.new(:comma)
+    end
+
     private
 
     def consume_token
@@ -97,6 +103,8 @@ module ToyLang
         return open_parentheses
       elsif @program =~ CLOSE_PARENTHESES
         return close_parentheses
+      elsif @program =~ COMMA
+        return comma
       end
     end
 

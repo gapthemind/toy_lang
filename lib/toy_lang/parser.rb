@@ -108,8 +108,17 @@ module ToyLang
     # parameter_list =>
     #   (expression ( COMMA expression)*)
     def parameter_list
-      # TODO: create proper implementation
-      [ { number: "1" } ]
+      expression_list = []
+      expr = expression()
+      expression_list << expr if expr != nil
+
+      while (token_is? :comma)
+        @scanner.get_next_token # the comma
+        expr = expression()
+        expression_list << expr if expr != nil
+      end
+
+      expression_list
     end
 
     # return_statement =>

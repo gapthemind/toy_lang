@@ -16,8 +16,9 @@ describe ToyLang::Parser do
   describe "function call" do
     it "parses function" do
       #TODO: expand when parameter_list gets implemented
-      @parser.program = "methodname()"
-      @parser.statement.should == { function_call: 'methodname', :params => [ {number: "1"}]}
+      @parser.program = "methodname(1,3)"
+      @parser.statement.should == { function_call: 'methodname',
+                                    params: [ {number: "1"}, {number: "3"} ]}
     end
   end
 end
