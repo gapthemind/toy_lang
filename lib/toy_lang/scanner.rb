@@ -13,13 +13,31 @@ module ToyLang
     IDENTIFIER = /\A[a-z]+/
     WHITESPACE = /\A\s+/
 
+    private
+    # These two utility functions help us
+    # create the set of regulars expressions
+    # that form the syntax of the language
+    #
+    # \A => begining of the string
+    def self.reg_exp(reg_exp)
+      /\A#{reg_exp}/
+    end
+
+    # For characters that have to be escaped
+    # in the regular expression
+    def self.escaped_reg_exp(reg_exp)
+      regular_expression = "\\#{reg_exp}"
+      /\A#{regular_expression}/
+    end
+
+    public
     LANGUAGE_TOKENS = {
-      number: /\A\d+/,
-      open_block: /\A\{/,
-      close_block: /\A\}/,
-      open_parentheses: /\A\(/,
-      close_parentheses: /\A\)/,
-      comma: /\A,/
+      number: reg_exp('\d+'),
+      open_block: escaped_reg_exp('{'),
+      close_block: escaped_reg_exp('}'),
+      open_parentheses: escaped_reg_exp('('),
+      close_parentheses: escaped_reg_exp(')'),
+      comma: reg_exp(',')
     }
 
     RESERVED_WORDS = %w[return def]
