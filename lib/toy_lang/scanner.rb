@@ -48,14 +48,14 @@ module ToyLang
       @token_list[number_of_tokens - 1]
     end
 
+    private
+
     def identifier
       ident = consume(IDENTIFIER)
       # Check if the token is part of the reserved words
       return Token.new(ident.to_sym, ident) if RESERVED_WORDS.include? ident
       return Token.new(:id,ident)
     end
-
-    private
 
     def consume_token
       clear_whitespace
