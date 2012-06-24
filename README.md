@@ -2,13 +2,13 @@
 
 Parser for a simple languange. An example program would be:
 
-  def fibbo(number) {
-    if number == 0 { return 0 }
-    if number == 1 { return 1 }
-    return fibbo(number-1) + fibbo(number-2)
-  }
+    def fibbo(number) {
+      if number == 0 { return 0 }
+      if number == 1 { return 1 }
+      return fibbo(number-1) + fibbo(number-2)
+    }
 
-  fibbo(5)
+    fibbo(5)
 
 This program should output 8
 
@@ -28,12 +28,12 @@ Or install it yourself as:
 
 ## Usage
   
-  # Create a parser
-  @parser = ToyLang::Parser.new
-  # Set the program
-  @parser.program = "methodname(1,3)"
-  # Generate the AST
-  puts @parser.program
+    # Create a parser
+    @parser = ToyLang::Parser.new
+    # Set the program
+    @parser.program = "methodname(1,3)"
+    # Generate the AST
+    puts @parser.program
 
 TODO: Find better names to avoid collision between 'program =' and
 program
