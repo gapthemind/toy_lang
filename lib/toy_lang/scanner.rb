@@ -13,7 +13,7 @@ module ToyLang
     private
     # These two utility functions help us
     # create the set of regulars expressions
-    # that form the syntax of the language
+    # that form the lexemes of the language
     #
     # \A => begining of the string
     def self.reg_exp(reg_exp)
