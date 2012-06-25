@@ -66,6 +66,11 @@ describe ToyLang::Scanner do
     assert_token_is :close_parentheses
   end
 
+  it "checks for token separators between tokens" do
+    @scanner.set_program("abc123")
+    expect { @scanner.get_next_token}.to throw_symbol :scanner_exception
+  end
+
   it "scans small program" do
     @scanner.set_program """
       def method {

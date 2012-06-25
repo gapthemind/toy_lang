@@ -10,9 +10,6 @@ module ToyLang
     # :close_block => for '}'
     # :eof => for end of file
 
-    IDENTIFIER = /\A[a-z]+/
-    WHITESPACE = /\A\s+/
-
     private
     # These two utility functions help us
     # create the set of regulars expressions
@@ -31,8 +28,14 @@ module ToyLang
     end
 
     public
+    IDENTIFIER = reg_exp('[a-z]+')
+    WHITESPACE = reg_exp('\s+')
+    NUMBER = reg_exp('\d+')
+    TOKEN_SEPARATOR = reg_exp('[\s\{\}\(\),]') # for the time being, whitespace, parentheses and comma
+
+    CHECK_FOR_TOKEN_SEPARATOR = true
+
     LANGUAGE_TOKENS = {
-      number: reg_exp('\d+'),
       open_block: escaped_reg_exp('{'),
       close_block: escaped_reg_exp('}'),
       open_parentheses: escaped_reg_exp('('),
@@ -69,7 +72,7 @@ module ToyLang
     private
 
     def identifier
-      ident = consume(IDENTIFIER)
+      ident = consume(IDENTIFIER, CHECK_FOR_TOKEN_SEPARATOR)
       # Check if the token is part of the reserved words
       return Token.new(ident.to_sym, ident) if RESERVED_WORDS.include? ident
       return Token.new(:id,ident)
@@ -81,6 +84,8 @@ module ToyLang
         return Token.new(:eof)
       elsif @program =~ IDENTIFIER
         return identifier
+      elsif @program =~ NUMBER
+        return Token.new(:number, consume(NUMBER, CHECK_FOR_TOKEN_SEPARATOR))
       end
 
       # Check for language symbols
@@ -97,10 +102,19 @@ module ToyLang
       consume(WHITESPACE)
     end
 
-    def consume(regexp)
+    def consume(regexp, check_for_separator = false)
       content = @program[regexp]
       @program.gsub!(regexp,"")
+      check_for_token_separator if check_for_separator
       content
+    end
+
+    def check_for_token_separator
+      if @program.size == 0
+        return
+      end
+
+      throw :scanner_exception unless @program =~ TOKEN_SEPARATOR
     end
 
   end
