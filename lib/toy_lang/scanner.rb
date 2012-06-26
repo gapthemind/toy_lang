@@ -29,13 +29,14 @@ module ToyLang
 
     public
     IDENTIFIER = reg_exp('[a-z]+')
-    WHITESPACE = reg_exp('\s+')
+    WHITESPACE = reg_exp('[ \t\r\f]+') # Like \s without \n
     NUMBER = reg_exp('\d+')
     TOKEN_SEPARATOR = reg_exp('[\s\{\}\(\),]') # for the time being, whitespace, parentheses and comma
 
     CHECK_FOR_TOKEN_SEPARATOR = true
 
     LANGUAGE_TOKENS = {
+      new_line: reg_exp('\n'),
       open_block: escaped_reg_exp('{'),
       close_block: escaped_reg_exp('}'),
       open_parentheses: escaped_reg_exp('('),
