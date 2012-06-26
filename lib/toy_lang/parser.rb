@@ -25,24 +25,26 @@ module ToyLang
   #   expression =>
   #     additive_expression
   #   additive_expression =>
-  #     substraction_expression PLUS substraction_expression
+  #     substraction_expression (PLUS substraction_expression)+
   #   substraction_expression =>
-  #     primary_expresion MINUS primary_expresion
-  #   primary_expresion =>
+  #     primary_expresion (MINUS primary_expresion)+
+  #   * primary_expresion =>
   #     NUMBER
-  #   function_call =>
+  #   * function_call =>
   #     IDENTIFIER OPEN_PARENTHESES parameter_list CLOSE_PARENTHESES
-  #   parameter_list =>
+  #   * parameter_list =>
   #     (expression ( COMMA expression)*)
-  #   return_statement =>
+  #   * return_statement =>
   #     RETURN expression
   #
   # An example program would be
-  # def fibbo(number) {
-  #   if number == 0 { return 0 }
-  #   if number == 1 { return 1 }
+  # def fibbo(number)
+  #   if number == 0
+  #     return 0
+  #   if number == 1
+  #     return 1
   #   return fibbo(number-1) + fibbo(number-2)
-  # }
+  #
   # fibbo(5)
   #
   # This program should output 8
@@ -140,6 +142,39 @@ module ToyLang
     # To get going, expression can only be a number
     # TODO: Do it for real
     def expression
+      return additive_expression
+    end
+
+    # additive_expression =>
+    #   substraction_expression (PLUS substraction_expression)+
+    def additive_expression
+      first_operand = substraction_expression
+      if first_operand == nil
+        return
+      end
+
+      operand_list = [first_operand]
+      while (token_is? :plus)
+        @scanner.get_next_token
+        operand = substraction_expression
+        throw scanner_exception if operand == nil
+        operand_list << operand
+      end
+
+      if operand_list.size == 1
+        return first_operand
+      else
+        return {plus: operand_list}
+      end
+    end
+
+    # substraction_expression =>
+    #   primary_expresion (MINUS primary_expresion)+
+    def substraction_expression
+      primary_expresion
+    end
+
+    def primary_expresion
       if token_is_not? :number
         nil
       end

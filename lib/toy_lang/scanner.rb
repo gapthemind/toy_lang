@@ -31,7 +31,14 @@ module ToyLang
     IDENTIFIER = reg_exp('[a-z]+')
     WHITESPACE = reg_exp('[ \t\r\f]+') # Like \s without \n
     NUMBER = reg_exp('\d+')
-    TOKEN_SEPARATOR = reg_exp('[\s\{\}\(\),]') # for the time being, whitespace, parentheses and comma
+    # for the time being, token separators are:
+    #   whitespace,
+    #   parentheses both the ( and the { pair
+    #   comma
+    #   plus
+    #   minus
+    #   equals
+    TOKEN_SEPARATOR = reg_exp('[\s\{\}\(\),\+\-=]') 
 
     CHECK_FOR_TOKEN_SEPARATOR = true
 
@@ -41,10 +48,13 @@ module ToyLang
       close_block: escaped_reg_exp('}'),
       open_parentheses: escaped_reg_exp('('),
       close_parentheses: escaped_reg_exp(')'),
+      equals: reg_exp('=='),
+      plus: escaped_reg_exp('+'),
+      minus: escaped_reg_exp('-'),
       comma: reg_exp(',')
     }
 
-    RESERVED_WORDS = %w[return def]
+    RESERVED_WORDS = %w[return def if]
 
     def set_program(program)
       @program = program
