@@ -2,11 +2,12 @@
 
 Parser for a simple languange. An example program would be:
 
-    def fibbo(number) {
-      if number == 0 { return 0 }
-      if number == 1 { return 1 }
+    def fibbo(number)
+      if number == 0
+        return 0
+      if number == 1
+        return 1
       return fibbo(number-1) + fibbo(number-2)
-    }
 
     fibbo(5)
 

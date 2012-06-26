@@ -29,13 +29,14 @@ module ToyLang
 
     public
     IDENTIFIER = reg_exp('[a-z]+')
-    WHITESPACE = reg_exp('\s+')
+    WHITESPACE = reg_exp('[ \t\r\f]+') # Like \s without \n
     NUMBER = reg_exp('\d+')
     TOKEN_SEPARATOR = reg_exp('[\s\{\}\(\),]') # for the time being, whitespace, parentheses and comma
 
     CHECK_FOR_TOKEN_SEPARATOR = true
 
     LANGUAGE_TOKENS = {
+      new_line: reg_exp('\n'),
       open_block: escaped_reg_exp('{'),
       close_block: escaped_reg_exp('}'),
       open_parentheses: escaped_reg_exp('('),
@@ -48,6 +49,8 @@ module ToyLang
     def set_program(program)
       @program = program
       @token_list =[] # used to keep tokens in look_aheads
+      @new_line=true
+      @identation_level=0
     end
 
     def get_next_token
@@ -79,6 +82,38 @@ module ToyLang
     end
 
     def consume_token
+      if @new_line
+        @new_line = false
+        new_identation_level = identation_level
+        if new_identation_level != @identation_level
+          return open_or_close_block(new_identation_level)
+        end
+      end
+      token = identify_token
+      @new_line = token.is? :new_line
+      token
+    end
+
+    def open_or_close_block(new_identation_level)
+      if @identation_level == new_identation_level + 1
+        @identation_level = new_identation_level
+        return Token.new(:close_block)
+      elsif @identation_level == new_identation_level - 1
+        @identation_level = new_identation_level
+        return Token.new(:open_block)
+      end
+      throw :scanner_exception
+    end
+
+    def identation_level
+      if @program[/\A +/]
+        @program[/\A +/].length / 2
+      else
+        0
+      end
+    end
+
+    def identify_token
       clear_whitespace
       if @program.size == 0
         return Token.new(:eof)

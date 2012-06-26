@@ -12,7 +12,7 @@ describe ToyLang::Scanner do
   end
 
   it "clears white spaces" do
-    @scanner.set_program("  \n\t")
+    @scanner.set_program("\r\f\t  ")
     assert_token_is :eof
   end
 
@@ -73,16 +73,20 @@ describe ToyLang::Scanner do
 
   it "scans small program" do
     @scanner.set_program """
-      def method {
-        return 9
-      }
-      """
+def method
+  return 9
+
+"""
+    assert_token_is :new_line
     assert_token_is :def
     assert_token_and_content_is :id, "method"
+    assert_token_is :new_line
     assert_token_is :open_block
     assert_token_is :return
     assert_token_and_content_is :number, "9"
+    assert_token_is :new_line
     assert_token_is :close_block
+    assert_token_is :new_line
     assert_token_is :eof
   end
 
