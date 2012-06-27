@@ -1,7 +1,7 @@
 module ToyLang
 
-  # This it the class that parses the toy language
-  # grammatical rules are lower cased (e.g. statement)
+  # This it the class that parses the toy language.
+  # Grammatical rules are lower cased (e.g. statement)
   # tokens are upper case (e.g. COMMA)
   # optional rules are surrounded by parentheses
   #
@@ -9,20 +9,20 @@ module ToyLang
   #
   #   program =>
   #     statement*
-  #   statement =>
+  #   * statement =>
   #     function_definition |
   #     conditional_statement |
   #     function_call |
   #     return_statement
-  #   function_definition =>
+  #   * function_definition =>
   #     function_header OPEN_BLOCK expression* CLOSE_BLOCK
-  #   function_header =>
+  #   * function_header =>
   #     DEF IDENTIFIER OPEN_PARENTHESES argument_list CLOSE_PARENTHESES
-  #   argument_list =>
-  #     (IDENTIFIER ( COMMA IDENTIFIER)*)
+  #   * argument_list =>
+  #     (IDENTIFIER ( COMMA IDENTIFIER)*
   #   * conditional_statement =>
   #     IF conditional_expression OPEN_BLOCK expression* CLOSE_BLOCK
-  #   conditional_expression =>
+  #   * conditional_expression =>
   #     expression EQUALS expression
   #   * expression =>
   #     additive_expression
@@ -55,6 +55,15 @@ module ToyLang
     def program=(program)
       @scanner = Scanner.new
       @scanner.set_program(program)
+    end
+
+    # program =>
+    #   statement*
+    def program
+      statement_list = []
+      while ((new_statement = statement()) != nil)
+        statement_list << new_statement
+      end
     end
 
     # statement =>
@@ -155,6 +164,50 @@ module ToyLang
     # TODO: Do it for real
     def expression
       return additive_expression
+    end
+
+    # function_definition =>
+    #   function_header OPEN_BLOCK expression* CLOSE_BLOCK
+    def function_definition
+      function_header = function_header()
+      if function_header == nil
+        return
+      end
+      require :new_line
+      require :open_block
+      expr_list = []
+      while ((expr = expression()) != nil)
+        expr_list << expr
+      end
+      return {fn: {function_header: function_header, expr_list: expr_list}}
+    end
+
+    # function_header =>
+    #   DEF IDENTIFIER OPEN_PARENTHESES argument_list CLOSE_PARENTHESES
+    def function_header
+      if token_is_not? :def
+        return nil
+      end
+      require :def
+      method_name = require :id
+      require :open_parentheses
+      argument_list = argument_list()
+      require :close_parentheses
+      { method_name: method_name, argument_list: argument_list }
+    end
+
+    # argument_list =>
+    #   (IDENTIFIER ( COMMA IDENTIFIER)*
+    def argument_list
+      recursive_expression(:identifier, :comma)
+    end
+
+    def identifier
+      if token_is_not? :id
+        return nil
+      end
+
+      return require :id
     end
 
     # additive_expression =>
