@@ -27,6 +27,10 @@ module ToyLang
       /\A#{regular_expression}/
     end
 
+    def self.token(token_symbol, regular_expression)
+      LANGUAGE_TOKENS[token_symbol] = regular_expression
+    end
+
     public
     IDENTIFIER = reg_exp('[a-z]+')
     WHITESPACE = reg_exp('[ \t\r\f]+') # Like \s without \n
@@ -42,17 +46,19 @@ module ToyLang
 
     CHECK_FOR_TOKEN_SEPARATOR = true
 
-    LANGUAGE_TOKENS = {
-      new_line: reg_exp('\n'),
-      open_block: escaped_reg_exp('{'),
-      close_block: escaped_reg_exp('}'),
-      open_parentheses: escaped_reg_exp('('),
-      close_parentheses: escaped_reg_exp(')'),
-      equals: reg_exp('=='),
-      plus: escaped_reg_exp('+'),
-      minus: escaped_reg_exp('-'),
-      comma: reg_exp(',')
-    }
+    LANGUAGE_TOKENS = {}
+
+    token :new_line, reg_exp('\n')
+    token :open_block, escaped_reg_exp('{')
+    token :close_block, escaped_reg_exp('}')
+    token :open_parentheses, escaped_reg_exp('(')
+    token :close_parentheses, escaped_reg_exp(')')
+    token :equals, reg_exp('==')
+    token :plus, escaped_reg_exp('+')
+    token :minus, escaped_reg_exp('-')
+    token :comma, reg_exp(',')
+
+
 
     RESERVED_WORDS = %w[return def if]
 
