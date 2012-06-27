@@ -11,7 +11,7 @@ module ToyLang
   #     statement*
   #   statement =>
   #     function_definition |
-  #     conditional_expression |
+  #     conditional_statement |
   #     function_call |
   #     return_statement
   #   function_definition =>
@@ -20,8 +20,10 @@ module ToyLang
   #     DEF IDENTIFIER OPEN_PARENTHESES argument_list CLOSE_PARENTHESES
   #   argument_list =>
   #     (IDENTIFIER ( COMMA IDENTIFIER)*)
+  #   * conditional_statement =>
+  #     IF conditional_expression OPEN_BLOCK expression* CLOSE_BLOCK
   #   conditional_expression =>
-  #     IF condition OPEN_BLOCK expression* CLOSE_BLOCK
+  #     expression EQUALS expression
   #   * expression =>
   #     additive_expression
   #   * additive_expression =>
@@ -64,7 +66,7 @@ module ToyLang
       # ast => Abstract Syntax Tree
       if ((ast = function_definition) != nil)
         return ast
-      elsif ((ast = conditional_expression) != nil)
+      elsif ((ast = conditional_statement) != nil)
         return ast
       elsif ((ast = function_call) != nil)
         return ast
@@ -80,9 +82,9 @@ module ToyLang
       return nil
     end
 
-    # conditional_expression =>
-    #   IF condition OPEN_BLOCK expression* CLOSE_BLOCK
-    def conditional_expression
+    # conditional_statement =>
+    #   IF conditional_expression OPEN_BLOCK expression* CLOSE_BLOCK
+    def conditional_statement
       unless token_is? :if
         return nil
       end
@@ -98,6 +100,7 @@ module ToyLang
       end
 
       require :close_block
+      return { if: { condition: condition, expressions: expression_list }}
     end
 
     # function_call =>
@@ -229,7 +232,7 @@ module ToyLang
     end
 
     def require(token)
-      throw :parser_exception if token_is_not token
+      throw :parser_exception if token_is_not? token
       @scanner.get_next_token
     end
 
