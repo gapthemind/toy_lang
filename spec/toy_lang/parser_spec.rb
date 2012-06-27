@@ -6,6 +6,19 @@ describe ToyLang::Parser do
     @parser = ToyLang::Parser.new
   end
 
+  describe "conditional expression" do
+    it "passes for well formed expressions" do
+      @parser.program = " 2 == 3 "
+      expected = { equals: {first_operand: { number: "2" }, second_operand: { number: "3" } } }
+      @parser.conditional_expression.should == expected
+    end
+
+    it "fails if no conditional expression" do
+      @parser.program= " 2 == if "
+      expect { @parser.conditional_expression }.to throw_symbol :parser_exception
+    end
+  end
+
   describe "return statement" do
     it "parses" do
       @parser.program = "return 2"

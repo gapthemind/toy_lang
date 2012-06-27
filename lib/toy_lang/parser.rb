@@ -103,6 +103,24 @@ module ToyLang
       return { if: { condition: condition, expressions: expression_list }}
     end
 
+    # conditional_expression =>
+    #   expression EQUALS expression
+    def conditional_expression
+      first_operand = expression
+      puts "first_operand #{first_operand}"
+      if first_operand == nil
+        return nil
+      end
+      require :equals
+      second_operand = expression
+      puts "second_operand #{second_operand}"
+      if second_operand == nil
+        throw :parser_exception
+      end
+
+      return {equals: { first_operand: first_operand, second_operand: second_operand } }
+    end
+
     # function_call =>
     #   IDENTIFIER OPEN_PARENTHESES parameter_list CLOSE_PARENTHESES
     def function_call
@@ -191,6 +209,7 @@ module ToyLang
     end
 
     def primary_expresion
+      puts "left #{@scanner.program}"
       if token_is_not? :number
         nil
       end
