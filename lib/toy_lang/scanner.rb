@@ -44,11 +44,11 @@ module ToyLang
     #   equals
     TOKEN_SEPARATOR = reg_exp('[\s\{\}\(\),\+\-=]') 
 
-
     LANGUAGE_TOKENS = {}
     TOKEN_METHODS = {}
     CHECK_FOR_TOKEN_SEPARATOR = {}
 
+    token :eof, reg_exp('\A\z'), scan_method: :basic_token
     token :id, reg_exp('[a-z]+'), scan_method: :identifier, check_for_token_separator: true
     token :number, reg_exp('\d+'), scan_method: :basic_token, check_for_token_separator: true
     token :new_line, reg_exp('\n'), scan_method: :basic_token
@@ -136,11 +136,7 @@ module ToyLang
 
     def identify_token
       clear_whitespace
-      if @program.size == 0
-        return Token.new(:eof)
-      end
 
-      # Check for language symbols
       LANGUAGE_TOKENS.each do |symbol, reg_exp|
         if @program =~ reg_exp
           scan_method = TOKEN_METHODS[symbol]
