@@ -34,7 +34,6 @@ module ToyLang
     end
 
     public
-    IDENTIFIER = reg_exp('[a-z]+')
     WHITESPACE = reg_exp('[ \t\r\f]+') # Like \s without \n
     # for the time being, token separators are:
     #   whitespace,
@@ -50,6 +49,7 @@ module ToyLang
     TOKEN_METHODS = {}
     CHECK_FOR_TOKEN_SEPARATOR = {}
 
+    token :id, reg_exp('[a-z]+'), scan_method: :identifier, check_for_token_separator: true
     token :number, reg_exp('\d+'), scan_method: :basic_token, check_for_token_separator: true
     token :new_line, reg_exp('\n'), scan_method: :basic_token
     token :open_block, escaped_reg_exp('{'), scan_method: :basic_token
@@ -91,13 +91,6 @@ module ToyLang
 
     private
 
-    def identifier
-      ident = consume(IDENTIFIER, CHECK_FOR_TOKEN_SEPARATOR)
-      # Check if the token is part of the reserved words
-      return Token.new(ident.to_sym, ident) if RESERVED_WORDS.include? ident
-      return Token.new(:id,ident)
-    end
-
     def consume_token
       if @new_line
         @new_line = false
@@ -131,19 +124,20 @@ module ToyLang
       end
     end
 
-    def basic_token(symbol, content)
-      return Token.new(symbol, content)
+    def identifier(symbol,content)
+      # Check if the token is part of the reserved words
+      return Token.new(content.to_sym, content) if RESERVED_WORDS.include? content
+      return Token.new(:id,content)
     end
 
-    def ignore_token
+    def basic_token(symbol, content)
+      return Token.new(symbol, content)
     end
 
     def identify_token
       clear_whitespace
       if @program.size == 0
         return Token.new(:eof)
-      elsif @program =~ IDENTIFIER
-        return identifier
       end
 
       # Check for language symbols
