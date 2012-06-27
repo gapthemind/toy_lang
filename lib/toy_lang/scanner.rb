@@ -30,12 +30,12 @@ module ToyLang
     def self.token(token_symbol, regular_expression, token_description = {})
       LANGUAGE_TOKENS[token_symbol] = regular_expression
       TOKEN_METHODS[token_symbol] = token_description[:scan_method]
+      CHECK_FOR_TOKEN_SEPARATOR[token_symbol] = token_description[:check_for_token_separator]
     end
 
     public
     IDENTIFIER = reg_exp('[a-z]+')
     WHITESPACE = reg_exp('[ \t\r\f]+') # Like \s without \n
-    NUMBER = reg_exp('\d+')
     # for the time being, token separators are:
     #   whitespace,
     #   parentheses both the ( and the { pair
@@ -45,11 +45,12 @@ module ToyLang
     #   equals
     TOKEN_SEPARATOR = reg_exp('[\s\{\}\(\),\+\-=]') 
 
-    CHECK_FOR_TOKEN_SEPARATOR = true
 
     LANGUAGE_TOKENS = {}
     TOKEN_METHODS = {}
+    CHECK_FOR_TOKEN_SEPARATOR = {}
 
+    token :number, reg_exp('\d+'), scan_method: :basic_token, check_for_token_separator: true
     token :new_line, reg_exp('\n'), scan_method: :basic_token
     token :open_block, escaped_reg_exp('{'), scan_method: :basic_token
     token :close_block, escaped_reg_exp('}'), scan_method: :basic_token
@@ -110,6 +111,7 @@ module ToyLang
       token
     end
 
+
     def open_or_close_block(new_identation_level)
       if @identation_level == new_identation_level + 1
         @identation_level = new_identation_level
@@ -133,20 +135,23 @@ module ToyLang
       return Token.new(symbol, content)
     end
 
+    def ignore_token
+    end
+
     def identify_token
       clear_whitespace
       if @program.size == 0
         return Token.new(:eof)
       elsif @program =~ IDENTIFIER
         return identifier
-      elsif @program =~ NUMBER
-        return Token.new(:number, consume(NUMBER, CHECK_FOR_TOKEN_SEPARATOR))
       end
 
       # Check for language symbols
       LANGUAGE_TOKENS.each do |symbol, reg_exp|
         if @program =~ reg_exp
-          return send(TOKEN_METHODS[symbol], symbol, consume(reg_exp))
+          scan_method = TOKEN_METHODS[symbol]
+          needs_token_separator = CHECK_FOR_TOKEN_SEPARATOR[symbol]
+          return send(scan_method, symbol, consume(reg_exp, needs_token_separator))
         end
       end
 
