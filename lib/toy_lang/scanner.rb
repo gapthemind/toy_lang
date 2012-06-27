@@ -27,8 +27,9 @@ module ToyLang
       /\A#{regular_expression}/
     end
 
-    def self.token(token_symbol, regular_expression)
+    def self.token(token_symbol, regular_expression, token_description = {})
       LANGUAGE_TOKENS[token_symbol] = regular_expression
+      TOKEN_METHODS[token_symbol] = token_description[:scan_method]
     end
 
     public
@@ -47,18 +48,17 @@ module ToyLang
     CHECK_FOR_TOKEN_SEPARATOR = true
 
     LANGUAGE_TOKENS = {}
+    TOKEN_METHODS = {}
 
-    token :new_line, reg_exp('\n')
-    token :open_block, escaped_reg_exp('{')
-    token :close_block, escaped_reg_exp('}')
-    token :open_parentheses, escaped_reg_exp('(')
-    token :close_parentheses, escaped_reg_exp(')')
-    token :equals, reg_exp('==')
-    token :plus, escaped_reg_exp('+')
-    token :minus, escaped_reg_exp('-')
-    token :comma, reg_exp(',')
-
-
+    token :new_line, reg_exp('\n'), scan_method: :basic_token
+    token :open_block, escaped_reg_exp('{'), scan_method: :basic_token
+    token :close_block, escaped_reg_exp('}'), scan_method: :basic_token
+    token :open_parentheses, escaped_reg_exp('('), scan_method: :basic_token
+    token :close_parentheses, escaped_reg_exp(')'), scan_method: :basic_token
+    token :equals, reg_exp('=='), scan_method: :basic_token
+    token :plus, escaped_reg_exp('+'), scan_method: :basic_token
+    token :minus, escaped_reg_exp('-'), scan_method: :basic_token
+    token :comma, reg_exp(','), scan_method: :basic_token
 
     RESERVED_WORDS = %w[return def if]
 
@@ -129,6 +129,10 @@ module ToyLang
       end
     end
 
+    def basic_token(symbol, content)
+      return Token.new(symbol, content)
+    end
+
     def identify_token
       clear_whitespace
       if @program.size == 0
@@ -142,7 +146,7 @@ module ToyLang
       # Check for language symbols
       LANGUAGE_TOKENS.each do |symbol, reg_exp|
         if @program =~ reg_exp
-          return Token.new(symbol, consume(reg_exp))
+          return send(TOKEN_METHODS[symbol], symbol, consume(reg_exp))
         end
       end
 
