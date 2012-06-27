@@ -160,38 +160,25 @@ module ToyLang
     # additive_expression =>
     #   substraction_expression (PLUS substraction_expression)+
     def additive_expression
-      first_operand = substraction_expression
-      if first_operand == nil
-        return
-      end
-
-      operand_list = [first_operand]
-      while (token_is? :plus)
-        @scanner.get_next_token
-        operand = substraction_expression
-        throw scanner_exception if operand == nil
-        operand_list << operand
-      end
-
-      if operand_list.size == 1
-        return first_operand
-      else
-        return {plus: operand_list}
-      end
+      recursive_expression(:substraction_expression, :plus)
     end
 
     # substraction_expression =>
     #   primary_expresion (MINUS primary_expresion)+
     def substraction_expression
-      first_operand = primary_expresion
+      recursive_expression(:primary_expresion, :minus)
+    end
+
+    def recursive_expression(operand_method, separator)
+      first_operand = send(operand_method)
       if first_operand == nil
         return
       end
 
       operand_list = [first_operand]
-      while (token_is? :minus)
+      while (token_is? separator)
         @scanner.get_next_token
-        operand = primary_expresion
+        operand = send(operand_method)
         throw scanner_exception if operand == nil
         operand_list << operand
       end
@@ -199,7 +186,7 @@ module ToyLang
       if operand_list.size == 1
         return first_operand
       else
-        return {minus: operand_list}
+        return {separator => operand_list}
       end
     end
 
