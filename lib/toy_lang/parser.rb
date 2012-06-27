@@ -22,11 +22,11 @@ module ToyLang
   #     (IDENTIFIER ( COMMA IDENTIFIER)*)
   #   conditional_expression =>
   #     IF condition OPEN_BLOCK expression* CLOSE_BLOCK
-  #   expression =>
+  #   * expression =>
   #     additive_expression
-  #   additive_expression =>
+  #   * additive_expression =>
   #     substraction_expression (PLUS substraction_expression)+
-  #   substraction_expression =>
+  #   * substraction_expression =>
   #     primary_expresion (MINUS primary_expresion)+
   #   * primary_expresion =>
   #     NUMBER
@@ -83,7 +83,21 @@ module ToyLang
     # conditional_expression =>
     #   IF condition OPEN_BLOCK expression* CLOSE_BLOCK
     def conditional_expression
-      return nil
+      unless token_is? :if
+        return nil
+      end
+
+      @scanner.get_next_token # The 'if'
+      condition = conditional_expression
+      require :new_line
+      require :open_block
+
+      expression_list = []
+      while ((new_expression = expression()) != nil)
+        expression_list << new_expression
+      end
+
+      require :close_block
     end
 
     # function_call =>
@@ -97,12 +111,7 @@ module ToyLang
       @scanner.get_next_token # open parentheses
       params = parameter_list()
 
-      # Verify close parentheses
-      if token_is_not? :close_parentheses
-        throw :parser_exception
-      end
-
-      @scanner.get_next_token # close parentheses
+      require :close_parentheses
 
       return { function_call: method_name, params: params }
     end
@@ -171,7 +180,24 @@ module ToyLang
     # substraction_expression =>
     #   primary_expresion (MINUS primary_expresion)+
     def substraction_expression
-      primary_expresion
+      first_operand = primary_expresion
+      if first_operand == nil
+        return
+      end
+
+      operand_list = [first_operand]
+      while (token_is? :minus)
+        @scanner.get_next_token
+        operand = primary_expresion
+        throw scanner_exception if operand == nil
+        operand_list << operand
+      end
+
+      if operand_list.size == 1
+        return first_operand
+      else
+        return {minus: operand_list}
+      end
     end
 
     def primary_expresion
@@ -200,6 +226,11 @@ module ToyLang
         look_ahead_index += 1
       end
       return true
+    end
+
+    def require(token)
+      throw :parser_exception if token_is_not token
+      @scanner.get_next_token
     end
 
   end
