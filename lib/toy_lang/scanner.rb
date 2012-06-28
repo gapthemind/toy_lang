@@ -34,7 +34,8 @@ module ToyLang
     end
 
     public
-    WHITESPACE = reg_exp('[ \t\r\f]+') # Like \s without \n
+    WHITESPACE = reg_exp('\A[ \t\r\f]+') # Like \s without \n
+    WHITE_LINE = reg_exp('\A\s+(#.*)?$') # empty line or line with comments
     # for the time being, token separators are:
     #   whitespace,
     #   parentheses both the ( and the { pair
@@ -92,16 +93,24 @@ module ToyLang
     private
 
     def consume_token
+      # Double newlines should only report one 
+      # :new_line token
+      was_new_line = @new_line
+
       if @new_line
+        clear_white_line
         @new_line = false
         new_identation_level = identation_level
         if new_identation_level != @identation_level
           return open_or_close_block(new_identation_level)
         end
       end
-      token = identify_token
-      @new_line = token.is? :new_line
-      token
+
+      #begin
+        new_token = identify_token
+        @new_line = new_token.is? :new_line
+      #end while was_new_line && @new_line
+      new_token
     end
 
 
@@ -146,6 +155,12 @@ module ToyLang
       end
 
       throw :scanner_exception # Unrecognized token
+    end
+
+    def clear_white_line
+      while (@program =~ WHITE_LINE)
+        consume(WHITE_LINE)
+      end
     end
 
     def clear_whitespace

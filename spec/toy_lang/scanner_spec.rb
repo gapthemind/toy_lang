@@ -16,6 +16,13 @@ describe ToyLang::Scanner do
     assert_token_is :eof
   end
 
+  it "retuns only one new_line when multiple new_lines" do
+    @scanner.set_program("identifier\n\n\n")
+    assert_token_is :id
+    assert_token_is :new_line
+    assert_token_is :eof
+  end
+
   it "returns :return when token is 'return'" do
     @scanner.set_program("return")
     assert_token_is :return
@@ -72,12 +79,14 @@ describe ToyLang::Scanner do
   end
 
   it "scans small program" do
-    @scanner.set_program """
-def method
+    @scanner.set_program """def method
   return 9
+#this is a comment
+    #this is another one
+
+method()
 
 """
-    assert_token_is :new_line
     assert_token_is :def
     assert_token_and_content_is :id, "method"
     assert_token_is :new_line
@@ -86,6 +95,10 @@ def method
     assert_token_and_content_is :number, "9"
     assert_token_is :new_line
     assert_token_is :close_block
+    assert_token_is :new_line
+    assert_token_is :id
+    assert_token_is :open_parentheses
+    assert_token_is :close_parentheses
     assert_token_is :new_line
     assert_token_is :eof
   end

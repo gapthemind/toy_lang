@@ -61,8 +61,10 @@ module ToyLang
     #   statement*
     def program
       statement_list = []
-      while ((new_statement = statement()) != nil)
-        statement_list << new_statement
+      while (@scanner.look_ahead.is_not? :eof)
+        statement_list << statement
+        puts statement_list
+        2.times { puts "***" }
       end
     end
 
@@ -83,12 +85,6 @@ module ToyLang
         return ast
       end
       throw :parser_exception
-    end
-
-    # function_definition =>
-    #   function_header OPEN_BLOCK expression* CLOSE_BLOCK
-    def function_definition
-      return nil
     end
 
     # conditional_statement =>
@@ -116,13 +112,11 @@ module ToyLang
     #   expression EQUALS expression
     def conditional_expression
       first_operand = expression
-      puts "first_operand #{first_operand}"
       if first_operand == nil
         return nil
       end
       require :equals
       second_operand = expression
-      puts "second_operand #{second_operand}"
       if second_operand == nil
         throw :parser_exception
       end
@@ -138,6 +132,7 @@ module ToyLang
       end
 
       method_name = @scanner.get_next_token.content
+      puts "method name #{method_name}"
       @scanner.get_next_token # open parentheses
       params = parameter_list()
 
@@ -149,19 +144,7 @@ module ToyLang
     # parameter_list =>
     #   (expression ( COMMA expression)*)
     def parameter_list
-      expression_list = []
-      expr = expression()
-      return [] if expr == nil
-
-      expression_list << expr
-
-      while (token_is? :comma)
-        @scanner.get_next_token # the comma
-        expr = expression()
-        expression_list << expr if expr != nil
-      end
-
-      expression_list
+      recursive_expression(:expression, :comma)
     end
 
     # return_statement =>
@@ -211,7 +194,7 @@ module ToyLang
       require :open_parentheses
       argument_list = argument_list()
       require :close_parentheses
-      { method_name: method_name, argument_list: argument_list }
+      { method_name: method_name.content, argument_list: argument_list }
     end
 
     # argument_list =>
@@ -231,40 +214,49 @@ module ToyLang
     # additive_expression =>
     #   substraction_expression (PLUS substraction_expression)+
     def additive_expression
-      recursive_expression(:substraction_expression, :plus)
+      substraction_expressions = recursive_expression(:substraction_expression, :plus)
+      if substraction_expressions.class == Array.class
+        {plus: substraction_expressions}
+      else
+        substraction_expressions
+      end
     end
 
     # substraction_expression =>
     #   primary_expresion (MINUS primary_expresion)+
     def substraction_expression
-      recursive_expression(:primary_expresion, :minus)
+      primary_expressions = recursive_expression(:primary_expresion, :minus)
+      if primary_expressions.class == Array.class
+        {minus: primary_expressions}
+      else
+        primary_expressions
+      end
     end
 
     def recursive_expression(operand_method, separator)
       first_operand = send(operand_method)
       if first_operand == nil
-        return
+        return nil
       end
 
       operand_list = [first_operand]
       while (token_is? separator)
         @scanner.get_next_token
         operand = send(operand_method)
-        throw scanner_exception if operand == nil
+        throw :parser_exception if operand == nil
         operand_list << operand
       end
 
       if operand_list.size == 1
         return first_operand
       else
-        return {separator => operand_list}
+        return operand_list
       end
     end
 
     def primary_expresion
-      puts "left #{@scanner.program}"
       if token_is_not? :number
-        nil
+        return nil
       end
 
       token = @scanner.get_next_token
