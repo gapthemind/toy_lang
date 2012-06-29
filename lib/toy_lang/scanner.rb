@@ -35,7 +35,7 @@ module ToyLang
 
     public
     WHITESPACE = reg_exp('\A[ \t\r\f]+') # Like \s without \n
-    WHITE_LINE = reg_exp('\A\s+(#.*)?$') # empty line or line with comments
+    WHITE_LINE = reg_exp('\A\s*(#.*)?$') # empty line or line with comments
     # for the time being, token separators are:
     #   whitespace,
     #   parentheses both the ( and the { pair
@@ -106,10 +106,8 @@ module ToyLang
         end
       end
 
-      #begin
-        new_token = identify_token
-        @new_line = new_token.is? :new_line
-      #end while was_new_line && @new_line
+      new_token = identify_token
+      @new_line = new_token.is? :new_line
       new_token
     end
 
@@ -158,8 +156,9 @@ module ToyLang
     end
 
     def clear_white_line
-      while (@program =~ WHITE_LINE)
+      while (@program =~ WHITE_LINE && @program.size > 0)
         consume(WHITE_LINE)
+        consume(Scanner::reg_exp('\n'))
       end
     end
 

@@ -95,7 +95,6 @@ method()
     assert_token_and_content_is :number, "9"
     assert_token_is :new_line
     assert_token_is :close_block
-    assert_token_is :new_line
     assert_token_is :id
     assert_token_is :open_parentheses
     assert_token_is :close_parentheses
