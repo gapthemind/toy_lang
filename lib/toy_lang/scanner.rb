@@ -50,7 +50,7 @@ module ToyLang
     CHECK_FOR_TOKEN_SEPARATOR = {}
 
     token :eof, reg_exp('\A\z'), scan_method: :basic_token
-    token :id, reg_exp('[a-z]+'), scan_method: :identifier, check_for_token_separator: true
+    token :id, reg_exp('[a-z][a-z_]*'), scan_method: :identifier, check_for_token_separator: true
     token :number, reg_exp('\d+'), scan_method: :basic_token, check_for_token_separator: true
     token :new_line, reg_exp('\n'), scan_method: :basic_token
     token :open_block, escaped_reg_exp('{'), scan_method: :basic_token
@@ -64,8 +64,11 @@ module ToyLang
 
     RESERVED_WORDS = %w[return def if]
 
+    attr_reader :program
+    attr_reader :token_list
+
     def set_program(program)
-      @program = program
+      @program = "#{program}\n"
       @token_list =[] # used to keep tokens in look_aheads
       @new_line=true
       @identation_level=0

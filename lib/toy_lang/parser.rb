@@ -63,8 +63,8 @@ module ToyLang
       statement_list = []
       while (@scanner.look_ahead.is_not? :eof)
         statement_list << statement
-        puts statement_list
       end
+      statement_list
     end
 
     # statement =>
@@ -75,12 +75,16 @@ module ToyLang
     def statement
       # ast => Abstract Syntax Tree
       if ((ast = function_definition) != nil)
+        require :new_line
         return ast
       elsif ((ast = conditional_statement) != nil)
+        require :new_line
         return ast
       elsif ((ast = function_call) != nil)
+        require :new_line
         return ast
       elsif ((ast = return_statement) != nil)
+        require :new_line
         return ast
       end
       throw :parser_exception
@@ -131,7 +135,6 @@ module ToyLang
       end
 
       method_name = @scanner.get_next_token.content
-      puts "method name #{method_name}"
       @scanner.get_next_token # open parentheses
       params = parameter_list()
 

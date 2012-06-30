@@ -6,6 +6,13 @@ describe ToyLang::Parser do
     @parser = ToyLang::Parser.new
   end
 
+  describe "program" do
+    it "consumes statements" do
+      @parser.program = "func_call(1)\nfn_call(2)\n"
+      @parser.program.size.should == 2
+    end
+  end
+
   describe "conditional expression" do
     it "passes for well formed expressions" do
       @parser.program = " 2 == 3 "
@@ -21,14 +28,14 @@ describe ToyLang::Parser do
 
   describe "return statement" do
     it "parses" do
-      @parser.program = "return 2"
+      @parser.program = "return 2\n"
       @parser.statement.should == {return: { number: "2" }}
     end
   end
 
   describe "function call" do
     it "parses function" do
-      @parser.program = "methodname(1,3)"
+      @parser.program = "methodname(1,3)\n"
       @parser.statement.should == { function_call: 'methodname',
                                     params: [ {number: "1"}, {number: "3"} ]}
     end
