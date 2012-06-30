@@ -23,6 +23,13 @@ describe ToyLang::Scanner do
     assert_token_is :eof
   end
 
+  it "ignores comment lines" do
+    @scanner.set_program("identifier\n  #this is a comment")
+    assert_token_is :id
+    assert_token_is :new_line
+    assert_token_is :eof
+  end
+
   it "returns :return when token is 'return'" do
     @scanner.set_program("return")
     assert_token_is :return
@@ -51,16 +58,6 @@ describe ToyLang::Scanner do
   it "returns content when token is digits" do
     @scanner.set_program("9823")
     assert_token_content_is "9823"
-  end
-
-  it "returns :open_block when token is '{'" do
-    @scanner.set_program("{")
-    assert_token_is :open_block
-  end
-
-  it "returns :close_block when token is '}'" do
-    @scanner.set_program("}")
-    assert_token_is :close_block
   end
 
   it "returns :open_parentheses when token is '('" do
@@ -100,6 +97,32 @@ method()
     assert_token_is :close_parentheses
     assert_token_is :new_line
     assert_token_is :eof
+  end
+
+  describe "open and close blocks" do
+    it "opens block when identation increases" do
+      @scanner.set_program("identifier\n  identifier")
+      assert_token_is :id
+      assert_token_is :new_line
+      assert_token_is :open_block
+    end
+
+    it "closes block when identation decreases" do
+      @scanner.set_program("identifier\n  identifieri\nidentifier")
+      assert_token_is :id
+      assert_token_is :new_line
+      assert_token_is :open_block
+      assert_token_is :id
+      assert_token_is :new_line
+      assert_token_is :close_block
+    end
+
+    it "throws exception if incorrect level of identation" do
+      @scanner.set_program("identifier\n    identifier")
+      assert_token_is :id
+      assert_token_is :new_line
+      expect { @scanner.get_next_token }.to throw_symbol :scanner_exception
+    end
   end
 
   describe "look_ahead" do

@@ -64,7 +64,6 @@ module ToyLang
       while (@scanner.look_ahead.is_not? :eof)
         statement_list << statement
         puts statement_list
-        2.times { puts "***" }
       end
     end
 
