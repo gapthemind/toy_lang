@@ -20,7 +20,7 @@ describe ToyLang::Parser do
     end
 
     it "parses conditional statements" do
-      @parser.program "if 1 == 2\n  return 3\n"
+      @parser.program = "if 1 == 2\n  return 3\nident"
       @parser.statement[:if].class == Hash.class
     end
 

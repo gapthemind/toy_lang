@@ -74,10 +74,10 @@ module ToyLang
     #   return_statement
     def statement
       # ast => Abstract Syntax Tree
+      puts "Looking for a statement"
       if ((ast = function_definition) != nil)
         return ast
       elsif ((ast = conditional_statement) != nil)
-        require :new_line
         return ast
       elsif ((ast = function_call) != nil)
         require :new_line
@@ -90,7 +90,7 @@ module ToyLang
     end
 
     # conditional_statement =>
-    #   IF conditional_expression OPEN_BLOCK expression* CLOSE_BLOCK
+    #   IF conditional_expression OPEN_BLOCK statement* CLOSE_BLOCK
     def conditional_statement
       unless token_is? :if
         return nil
@@ -100,14 +100,16 @@ module ToyLang
       condition = conditional_expression
       require :new_line
       require :open_block
-
-      expression_list = []
-      while ((new_expression = expression()) != nil)
-        expression_list << new_expression
+      puts ">> #{@scanner.look_ahead.symbol}"
+      statement_list = []
+      while (@scanner.look_ahead.is_not? :close_block)
+        statement_list << statement()
+        puts "LOOK_AHEAD #{@scanner.look_ahead.symbol}"
       end
+      puts "done"
 
       require :close_block
-      return { if: { condition: condition, expressions: expression_list }}
+      return { if: { condition: condition, statements: statement_list }}
     end
 
     # conditional_expression =>
@@ -155,7 +157,7 @@ module ToyLang
         return nil
       end
 
-      @scanner.get_next_token
+      @scanner.get_next_token # :return
       return {return: expression()}
     end
 
