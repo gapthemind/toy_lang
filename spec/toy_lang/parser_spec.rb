@@ -24,8 +24,15 @@ describe ToyLang::Parser do
       @parser.statement[:if].class == Hash.class
     end
 
-    it "parses function calls"
-    it "parses return statements"
+    it "parses function calls" do
+      @parser.program = "calling(1,2,3)"
+      @parser.statement[:function_call].class == Hash.class
+    end
+
+    it "parses return statements" do
+      @parser.program = "return 2"
+      @parser.statement[:return].class == Hash.class
+    end
   end
 
   describe "conditional expression" do
