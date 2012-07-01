@@ -13,6 +13,21 @@ describe ToyLang::Parser do
     end
   end
 
+  describe "statement" do
+    it "parses function definitions" do
+      @parser.program = "def function(a)\n  return a\n"
+      @parser.statement[:fn].class == Hash.class
+    end
+
+    it "parses conditional statements" do
+      @parser.program "if 1 == 2\n  return 3\n"
+      @parser.statement[:if].class == Hash.class
+    end
+
+    it "parses function calls"
+    it "parses return statements"
+  end
+
   describe "conditional expression" do
     it "passes for well formed expressions" do
       @parser.program = " 2 == 3 "

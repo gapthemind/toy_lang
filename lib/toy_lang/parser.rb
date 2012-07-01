@@ -75,7 +75,6 @@ module ToyLang
     def statement
       # ast => Abstract Syntax Tree
       if ((ast = function_definition) != nil)
-        require :new_line
         return ast
       elsif ((ast = conditional_statement) != nil)
         require :new_line
