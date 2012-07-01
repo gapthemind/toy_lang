@@ -15,7 +15,7 @@ describe ToyLang::Parser do
 
   describe "statement" do
     it "parses function definitions" do
-      @parser.program = "def function(a)\n  return a\n"
+      @parser.program = "def function(a)\n  return 1\n"
       @parser.statement[:fn].class == Hash.class
     end
 

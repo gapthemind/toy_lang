@@ -15,7 +15,7 @@ module ToyLang
   #     function_call |
   #     return_statement
   #   * function_definition =>
-  #     function_header OPEN_BLOCK expression* CLOSE_BLOCK
+  #     function_header OPEN_BLOCK statement* CLOSE_BLOCK
   #   * function_header =>
   #     DEF IDENTIFIER OPEN_PARENTHESES argument_list CLOSE_PARENTHESES
   #   * argument_list =>
@@ -168,7 +168,7 @@ module ToyLang
     end
 
     # function_definition =>
-    #   function_header OPEN_BLOCK expression* CLOSE_BLOCK
+    #   function_header OPEN_BLOCK statement* CLOSE_BLOCK
     def function_definition
       function_header = function_header()
       if function_header == nil
@@ -176,11 +176,15 @@ module ToyLang
       end
       require :new_line
       require :open_block
-      expr_list = []
-      while ((expr = expression()) != nil)
-        expr_list << expr
+
+      statement_list = []
+      while (@scanner.look_ahead.is_not? :close_block)
+        statement_list << statement()
       end
-      return {fn: {function_header: function_header, expr_list: expr_list}}
+
+      require :close_block
+
+      return {fn: {function_header: function_header, statement_list: statement_list}}
     end
 
     # function_header =>
