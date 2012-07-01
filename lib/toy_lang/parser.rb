@@ -33,11 +33,11 @@ module ToyLang
   #   * primary_expresion =>
   #     NUMBER
   #   * function_call =>
-  #     IDENTIFIER OPEN_PARENTHESES parameter_list CLOSE_PARENTHESES
+  #     IDENTIFIER OPEN_PARENTHESES parameter_list CLOSE_PARENTHESES NEW_LINE
   #   * parameter_list =>
   #     (expression ( COMMA expression)*)
   #   * return_statement =>
-  #     RETURN expression
+  #     RETURN expression NEW_LINE
   #
   # An example program would be
   # def fibbo(number)
@@ -74,16 +74,13 @@ module ToyLang
     #   return_statement
     def statement
       # ast => Abstract Syntax Tree
-      puts "Looking for a statement"
       if ((ast = function_definition) != nil)
         return ast
       elsif ((ast = conditional_statement) != nil)
         return ast
       elsif ((ast = function_call) != nil)
-        require :new_line
         return ast
       elsif ((ast = return_statement) != nil)
-        require :new_line
         return ast
       end
       throw :parser_exception
@@ -100,13 +97,10 @@ module ToyLang
       condition = conditional_expression
       require :new_line
       require :open_block
-      puts ">> #{@scanner.look_ahead.symbol}"
       statement_list = []
       while (@scanner.look_ahead.is_not? :close_block)
         statement_list << statement()
-        puts "LOOK_AHEAD #{@scanner.look_ahead.symbol}"
       end
-      puts "done"
 
       require :close_block
       return { if: { condition: condition, statements: statement_list }}
@@ -129,7 +123,7 @@ module ToyLang
     end
 
     # function_call =>
-    #   IDENTIFIER OPEN_PARENTHESES parameter_list CLOSE_PARENTHESES
+    #   IDENTIFIER OPEN_PARENTHESES parameter_list CLOSE_PARENTHESES NEW_LINE
     def function_call
       unless tokens_are?(:id, :open_parentheses)
         return nil
@@ -140,6 +134,7 @@ module ToyLang
       params = parameter_list()
 
       require :close_parentheses
+      require :new_line
 
       return { function_call: method_name, params: params }
     end
@@ -151,14 +146,16 @@ module ToyLang
     end
 
     # return_statement =>
-    #   RETURN expression
+    #   RETURN expression NEW_LINE
     def return_statement
       unless token_is? :return
         return nil
       end
 
       @scanner.get_next_token # :return
-      return {return: expression()}
+      expr = expression()
+      require :new_line
+      return {return: expr}
     end
 
     # expression =>
